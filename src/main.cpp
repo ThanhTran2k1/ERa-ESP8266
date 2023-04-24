@@ -42,6 +42,7 @@ int buttonPin2 = D6;
 int buttonPin3 = D7;
 //
 bool flagButton1 = false;
+bool flagButton2 = false;
 
 void IRAM_ATTR ISR_Button1()
 {
@@ -49,7 +50,7 @@ void IRAM_ATTR ISR_Button1()
   {
     ets_printf("ISR_Button1 triggered !");
     flagButton1 = true;
-    digitalWrite(led1, !digitalRead(led1));
+    digitalWrite(led1, HIGH);
   }
   lastMillisButton1 = millis();
 }
@@ -57,43 +58,13 @@ void IRAM_ATTR ISR_Button1()
 ERA_WRITE(V0)
 {
   int state1 = param.getInt();
+  if(state1 == 1) {
+    flagButton1 = true;
+  }
   digitalWrite(led1, state1);
   ERa.virtualWrite(V0, digitalRead(led1));
 }
-//////////////////////
-void IRAM_ATTR ISR_Button2()
-{
-  if (millis() - lastMillisButton2 > 20)
-  {
-    ets_printf("ISR_Button2 triggered !");
-    digitalWrite(led2, !digitalRead(led2));
-  }
-  lastMillisButton2 = millis();
-}
-
-ERA_WRITE(V1)
-{
-  int state2 = param.getInt();
-  digitalWrite(led2, state2);
-  ERa.virtualWrite(V1, digitalRead(led2));
-}
-////////////////////////////////
-void IRAM_ATTR ISR_Button3()
-{
-  if (millis() - lastMillisButton3 > 20)
-  {
-    ets_printf("ISR_Button2 triggered !");
-    digitalWrite(led3, !digitalRead(led3));
-  }
-  lastMillisButton3 = millis();
-}
-
-ERA_WRITE(V2)
-{
-  int state3 = param.getInt();
-  digitalWrite(led3, state3);
-  ERa.virtualWrite(V2, digitalRead(led3));
-}
+/////////////////
 
 /* This function print uptime every second */
 void timerEvent()
@@ -104,7 +75,7 @@ void timerEvent()
   ERA_LOG("Timer", "Uptime: %d", ERaMillis() / 1000L);
 }
 
-unsigned long time123;
+unsigned long time1;
 
 void setup()
 {
@@ -113,18 +84,16 @@ void setup()
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
-  pinMode(D0, OUTPUT);
-  time123 = millis();
   pinMode(buttonPin1, INPUT_PULLUP);
   pinMode(buttonPin2, INPUT_PULLUP);
   pinMode(buttonPin3, INPUT_PULLUP);
   attachInterrupt(buttonPin1, ISR_Button1, RISING);
-  attachInterrupt(buttonPin2, ISR_Button2, RISING);
-  attachInterrupt(buttonPin3, ISR_Button3, RISING);
+  // attachInterrupt(buttonPin2, ISR_Button2, RISING);
+  // attachInterrupt(buttonPin3, ISR_Button3, RISING);
   ERa.begin(ssid, pass);
 
   /* Setup timer called function every second */
-  timer.setInterval(100L, timerEvent);
+  timer.setInterval(50L, timerEvent);
 }
 
 void loop()
@@ -133,15 +102,14 @@ void loop()
   timer.run();
   if (flagButton1 == true)
   {
-    if ((unsigned long)(millis() - time123) > 2000)
+    if ((unsigned long)(millis() - time1) > 5000)
     {
-        digitalWrite(D0, HIGH);
+        digitalWrite(led1, LOW);
         flagButton1 = false;
 
-      time123 = millis();
-    }else {
-      digitalWrite(D0,LOW);
+      time1 = millis();
     }
-    
   }
+
+  
 }
