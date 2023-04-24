@@ -32,11 +32,11 @@ ERaTimer timer;
 long long int deboundMillis = 0;
 
 // khai bao bien LED
-int led1 = D5;
+int led1 = D3;
 int led2 = D7;
 int led3 = D8;
 // khai bao nut nhan
-int buttonPin1 = D3;
+int buttonPin1 = D1;
 int buttonPin2 = D2;
 int buttonPin3 = D4;
 //
