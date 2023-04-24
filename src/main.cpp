@@ -29,9 +29,8 @@ const char pass[] = "Mk NhuTen  123   @";
 
 ERaTimer timer;
 // khai bao bien debound nut nhan
-long long int lastMillisButton1 = 0;
-long long int lastMillisButton2 = 0;
-long long int lastMillisButton3 = 0;
+long long int deboundMillis = 0;
+
 // khai bao bien LED
 int led1 = D1;
 int led2 = D2;
@@ -46,25 +45,46 @@ bool flagButton2 = false;
 
 void IRAM_ATTR ISR_Button1()
 {
-  if (millis() - lastMillisButton1 > 20)
+  if (millis() - deboundMillis > 20)
   {
     ets_printf("ISR_Button1 triggered !");
     flagButton1 = true;
     digitalWrite(led1, HIGH);
   }
-  lastMillisButton1 = millis();
+  deboundMillis = millis();
 }
 
 ERA_WRITE(V0)
 {
   int state1 = param.getInt();
-  if(state1 == 1) {
+  if (state1 == 1)
+  {
     flagButton1 = true;
   }
   digitalWrite(led1, state1);
   ERa.virtualWrite(V0, digitalRead(led1));
 }
 /////////////////
+void IRAM_ATTR ISR_Button2()
+{
+  if (millis() - deboundMillis > 20)
+  {
+    ets_printf("ISR_Button2 triggered !");
+    flagButton2 = true;
+    digitalWrite(led2, HIGH);
+  }
+  deboundMillis = millis();
+}
+ERA_WRITE(V1)
+{
+  int state2 = param.getInt();
+  if (state2 == 1)
+  {
+    flagButton2 = true;
+  }
+  digitalWrite(led2, state2);
+  ERa.virtualWrite(V1, digitalRead(led2));
+}
 
 /* This function print uptime every second */
 void timerEvent()
@@ -76,11 +96,11 @@ void timerEvent()
 }
 
 unsigned long time1;
+unsigned long time2;
 
 void setup()
 {
   /* Setup debug console */
-  Serial.begin(115200);
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(led3, OUTPUT);
@@ -88,12 +108,12 @@ void setup()
   pinMode(buttonPin2, INPUT_PULLUP);
   pinMode(buttonPin3, INPUT_PULLUP);
   attachInterrupt(buttonPin1, ISR_Button1, RISING);
-  // attachInterrupt(buttonPin2, ISR_Button2, RISING);
+  attachInterrupt(buttonPin2, ISR_Button2, RISING);
   // attachInterrupt(buttonPin3, ISR_Button3, RISING);
   ERa.begin(ssid, pass);
 
   /* Setup timer called function every second */
-  timer.setInterval(50L, timerEvent);
+  timer.setInterval(100L, timerEvent);
 }
 
 void loop()
@@ -104,12 +124,19 @@ void loop()
   {
     if ((unsigned long)(millis() - time1) > 5000)
     {
-        digitalWrite(led1, LOW);
-        flagButton1 = false;
-
+      digitalWrite(led1, LOW);
+      flagButton1 = false;
       time1 = millis();
     }
   }
 
-  
+  if (flagButton2 == true)
+  {
+    if ((unsigned long)(millis() - time2) > 10000)
+    {
+      digitalWrite(led2, LOW);
+      flagButton2 = false;
+      time2 = millis();
+    }
+  }
 }
