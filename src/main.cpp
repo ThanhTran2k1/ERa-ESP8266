@@ -24,21 +24,21 @@
 #include <ERa.hpp>
 #include <ERa/ERaTimer.hpp>
 
-const char ssid[] = "Mk NhuTen  123   @";
-const char pass[] = "Mk NhuTen  123   @";
+const char ssid[] = "AIoT JSC";
+const char pass[] = "aiot1234";
 
 ERaTimer timer;
 // khai bao bien debound nut nhan
 long long int deboundMillis = 0;
 
 // khai bao bien LED
-int led1 = D3;
-int led2 = D7;
-int led3 = D8;
+int led1 = D1;
+int led2 = D2;
+int led3 = D3;
 // khai bao nut nhan
-int buttonPin1 = D1;
-int buttonPin2 = D2;
-int buttonPin3 = D4;
+int buttonPin1 = D4;
+int buttonPin2 = D6;
+int buttonPin3 = D7;
 //
 bool flagButton1 = false;
 bool flagButton2 = false;
@@ -133,9 +133,9 @@ void setup()
   pinMode(buttonPin1, INPUT_PULLUP);
   pinMode(buttonPin2, INPUT_PULLUP);
   pinMode(buttonPin3, INPUT_PULLUP);
-  attachInterrupt(buttonPin1, ISR_Button1, RISING);
-  attachInterrupt(buttonPin2, ISR_Button2, RISING);
-  attachInterrupt(buttonPin3, ISR_Button3, RISING);
+  attachInterrupt(buttonPin1, ISR_Button1, CHANGE);
+  attachInterrupt(buttonPin2, ISR_Button2, CHANGE);
+  attachInterrupt(buttonPin3, ISR_Button3, CHANGE);
   ERa.begin(ssid, pass);
 
   /* Setup timer called function every second */
@@ -144,8 +144,6 @@ void setup()
 
 void loop()
 {
-  ERa.run();
-  timer.run();
   if (flagButton1 == true)
   {
     if ((unsigned long)(millis() - time1) > 3000)
@@ -175,4 +173,7 @@ void loop()
       time3 = millis();
     }
   }
+  ERa.run();
+  timer.run();
+  
 }
